@@ -2,7 +2,7 @@ My reads applications
 
 ## Author
 
-* Niklaus Geisser
+Niklaus Geisser
 
 ## Run
 
