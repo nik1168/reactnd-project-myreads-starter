@@ -6,6 +6,7 @@ import SearchBook from './searchBooks'
 import './App.css'
 
 class BooksApp extends React.Component {
+
   state = {
     showSearchPage: false,
     books : []
@@ -13,32 +14,41 @@ class BooksApp extends React.Component {
 
   componentDidMount(){
     BooksAPI.getAll().then((books)=>{
-      console.log("RESPONSE??");
-      console.log(books);
       this.setState({
         books : books
       })
     })
   }
 
+  /**
+   * @description Updates a shelf with a given book
+   * @param shelf
+   * @param book
+   */
   updateShelf = (shelf,book) => {
     if(shelf!=='none'){
       this.setState((prevState)=>{
         books : prevState.books.map((item)=>(item.shelf=item.id===book.id?shelf:item.shelf))
-      })
+      });
       BooksAPI.update(book,shelf).then((response)=>{
       })
     }
   };
 
+  /**
+   * @description Adds a book to a shelf
+   * @param shelf
+   * @param book
+   */
   addBook = (shelf,book) =>{
     book.shelf = shelf;
     this.setState(prevState=>({
-      books : prevState.books.concat([book])
+      books : prevState.books.filter((b)=>b.id!==book.id).concat([book])
     }));
     BooksAPI.update(book,shelf).then((response)=>{
     })
   };
+
   render() {
     return (
       <div className="app">
