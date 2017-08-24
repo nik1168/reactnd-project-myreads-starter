@@ -1,75 +1,93 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
+import PropTypes from 'prop-types'
+import * as BooksAPI from './BooksAPI'
 import Book from './Books'
-class ListBooks extends React.Component{
+class searchBook extends React.Component{
+
+  static propTypes= {
+    books : PropTypes.array.isRequired,
+    updateShelf : PropTypes.func.isRequired
+  };
+
+  state = {
+    query : '',
+    books : []
+  };
+
+  /**
+   * @description Updates query state
+   * @param query
+   */
+  updateQuery = (query) => {
+    BooksAPI.search(query).then((response)=>{
+      let booksArray = [];
+      if(response){
+        booksArray = !response.error ?response:response.items;
+      }
+      this.setState({
+        books: booksArray
+      })
+    })
+  };
+
+  /**
+   * @description call parent update shelf function
+   * @param shelf
+   * @param book
+   */
   onChangeShelf = (shelf,book)=>{
     this.props.updateShelf(shelf,book);
   };
 
-  render(){
-    const books = this.props.books;
-    let read = books.filter((book)=>(book.shelf === 'read'));
-    let wantToRead = books.filter((book)=>(book.shelf === 'wantToRead'));
-    let currentlyReading = books.filter((book)=>(book.shelf === 'currentlyReading'));
-    return(
-      <div className="list-books">
-        <div className="list-books-title">
-          <h1>MyReads</h1>
-        </div>
-        <div className="list-books-content">
-          <div className="bookshelf">
-            <h2 className="bookshelf-title">Currently Reading</h2>
-            <div className="bookshelf-books">
-              <ol className="books-grid">
-                {
-                  currentlyReading.map((book,index)=>(
-                    <li key={index}>
-                      <Book book={book} onChangeShelf={this.onChangeShelf}/>
-                    </li>
-                  ))
-                }
-              </ol>
-            </div>
-          </div>
-          <div className="bookshelf">
-            <h2 className="bookshelf-title">Want to Read</h2>
-            <div className="bookshelf-books">
-              <ol className="books-grid">
-                {
-                  wantToRead.map((book,index)=>(
-                    <li key={index}>
-                      <Book book={book} onChangeShelf={this.onChangeShelf}/>
-                    </li>
-                  ))
-                }
-              </ol>
-            </div>
-          </div>
-          <div className="bookshelf">
-            <h2 className="bookshelf-title">Read</h2>
-            <div className="bookshelf-books">
-              <ol className="books-grid">
-                {
-                  read.map((book,index)=>(
-                    <li key={index}>
-                      <Book book={book} onChangeShelf={this.onChangeShelf}/>
-                    </li>
-                  ))
-                }
-              </ol>
-            </div>
-          </div>
-        </div>
-        <div className="open-search">
-          <Link
-            to="/search"
-            className="add-contact"
-          >Add a book</Link>
-        </div>
+  /**
+   * @description Check if a specific book is in a list of books.
+   * @param books
+   * @param book
+   * @returns Index of found book
+   */
+  isInList = (books,book)=>{
+    let indexBook = null;
+    books.map((itemBook,index)=>{
+      if(itemBook.id===book.id){
+        indexBook = index;
+      }
+    });
+    return indexBook;
+  };
+render(){
+  const {books} = this.state;
+  books.map((book)=>{
+    let index = this.isInList(this.props.books,book);
+    if(index){
+      book.shelf = this.props.books[index].shelf
+    }
+  });
+  return(
+    <div className="search-books">
+      <div className="search-books-bar">
+        <Link className="close-search" to="/">Close</Link>
+        <div className="search-books-input-wrapper">
+          <input
+            type="text"
+            onChange={(event)=>this.updateQuery(event.target.value)}
+            placeholder="Search by title or author"/>
 
+        </div>
       </div>
-    )
-  }
+      <div className="search-books-results">
+        <ol className="books-grid">
+          {
+            books.map((book,index)=>(
+              <li key={index}>
+                <Book book={book} onChangeShelf={this.onChangeShelf}/>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  )
 }
-export default ListBooks
+}
+export default searchBook
