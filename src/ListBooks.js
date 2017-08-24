@@ -1,8 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import Book from './Books'
+import Shelf from './Shelf'
 class ListBooks extends React.Component{
+
+  static propTypes= {
+    books : PropTypes.array.isRequired,
+    updateShelf : PropTypes.func.isRequired
+  };
+
+  /**
+   * @description call parent on change shelf function
+   * @param shelf
+   * @param book
+   */
   onChangeShelf = (shelf,book)=>{
     this.props.updateShelf(shelf,book);
   };
@@ -18,48 +29,9 @@ class ListBooks extends React.Component{
           <h1>MyReads</h1>
         </div>
         <div className="list-books-content">
-          <div className="bookshelf">
-            <h2 className="bookshelf-title">Currently Reading</h2>
-            <div className="bookshelf-books">
-              <ol className="books-grid">
-                {
-                  currentlyReading.map((book,index)=>(
-                    <li key={index}>
-                      <Book book={book} onChangeShelf={this.onChangeShelf}/>
-                    </li>
-                  ))
-                }
-              </ol>
-            </div>
-          </div>
-          <div className="bookshelf">
-            <h2 className="bookshelf-title">Want to Read</h2>
-            <div className="bookshelf-books">
-              <ol className="books-grid">
-                {
-                  wantToRead.map((book,index)=>(
-                    <li key={index}>
-                      <Book book={book} onChangeShelf={this.onChangeShelf}/>
-                    </li>
-                  ))
-                }
-              </ol>
-            </div>
-          </div>
-          <div className="bookshelf">
-            <h2 className="bookshelf-title">Read</h2>
-            <div className="bookshelf-books">
-              <ol className="books-grid">
-                {
-                  read.map((book,index)=>(
-                    <li key={index}>
-                      <Book book={book} onChangeShelf={this.onChangeShelf}/>
-                    </li>
-                  ))
-                }
-              </ol>
-            </div>
-          </div>
+          <Shelf title={'Currently Reading'} books={currentlyReading} onChangeShelf={this.onChangeShelf}></Shelf>
+          <Shelf title={'Want to Read'} books={wantToRead} onChangeShelf={this.onChangeShelf}></Shelf>
+          <Shelf title={'Read'} books={read} onChangeShelf={this.onChangeShelf}></Shelf>
         </div>
         <div className="open-search">
           <Link
